@@ -1,0 +1,136 @@
+﻿Machine Learning 1, Summer Term 2025
+Homework 2
+PCA and Neural Networks
+Florian Scherer (12232933)
+Linda Weiss (12108205)
+Group Number: g234
+
+
+    1. Neural Networks
+        1.1. PCA and Classification
+            1.1.1. PCA for dimesionality reduction:
+ 	We reduced the dimensionality of the images using Principal Component 	Analysis (PCA), from originally 4096 features (64×64 pixels) down to 128 	principal components. This was done to lower the computational cost for 	further processing and classification. While some information was inevitably lost 	in the process, the reduction preserves a substantial portion of the original data 	variance.
+	Below is the explained variance ratio for the 128 components:
+ 	0.16991706 0.044101   0.02962424 0.02682274 0.02540656 0.02113097
+ 	0.01558895 0.01162894 0.01053646 0.01002552 0.00896351 0.00861704
+ 	0.00825115 0.00783183 0.00686022 0.00662703 0.00646524 0.00567873
+ 	0.00550447 0.00535055 0.00525278 0.00502491 0.0048957  0.00475512
+ 	0.00473872 0.00442663 0.00427543 0.00415443 0.00410627 0.00383421
+ 	0.00371381 0.00370212 0.00356338 0.00345434 0.0033411  0.0032258
+ 	0.00318531 0.00308367 0.0030031  0.00293571 0.00285468 0.0027824
+ 	0.00273499 0.00264394 0.00258478 0.00256952 0.00253122 0.00249728
+ 	0.00242292 0.00240947 0.0023447  0.00232764 0.00229756 0.00227071
+ 	0.00218905 0.00214714 0.00209658 0.0020755  0.00204274 0.00203064
+ 	0.00200034 0.00198065 0.00194665 0.00192235 0.00191358 0.00188776
+ 	0.00187045 0.00182697 0.00181251 0.00177695 0.00175999 0.0017149
+ 	0.00169586 0.00168596 0.00167373 0.00165799 0.00163876 0.00162591
+ 	0.00160299 0.00157934 0.00157204 0.00156302 0.00153686 0.00150923
+ 	0.00150045 0.0014917  0.00148048 0.00146624 0.001453   0.00143867
+ 	0.00141202 0.00139908 0.00138966 0.00135919 0.00135531 0.00135458
+ 	0.00133131 0.0013166  0.00131402 0.00129704 0.00128422 0.00126928
+ 	0.00126022 0.00125416 0.001243   0.0012294  0.00121754 0.0012069
+ 	0.00119475 0.00118916 0.00118097 0.00117497 0.00115762 0.00115249
+ 	0.00113832 0.00113279 0.00111883 0.00111556 0.00111422 0.00110776
+ 	0.00109065 0.00107714 0.00107466 0.00106729 0.0010447  0.00103606
+ 	0.0010282  0.0010121
+
+ 	The cumulative explained variance is approximately 65.77 %, meaning that 	128 components retain most of the essential structure of the data. Although not 	lossless, this trade-off is considered acceptable for the classification tasks ahead.
+            1.1.2. Varying the number of hidden neurons/layers
+	After reducing the input dimensionality using PCA, we trained several neural 	network models with different hidden layer sizes. The goal was to find the 	architecture that generalizes best to unseen data. 
+	We evaluated each model based on two criteria: First, validation accuracy, as 	the primary measure of generalization performance. Second, the gap between 	training and validation accuracy, to assess the degree of overfitting. 
+	We selected the model that achieved the highest validation accuracy while 	maintaining a reasonable balance between learning performance and 	generalization. We additionally allowed a small margin of tolerance when 	comparing models: a new model could be selected even if it overfits slightly 	more than the current best one, as long as it achieved higher validation accuracy 	overall.
+
+	Following all possible layer models:
+	Hidden layer: (2,), Train accuracy: 0.6250, Validation accuracy: 0.5188
+	Training loss: 0.8973
+	Hidden layer: (8,), Train accuracy: 0.8430, Validation accuracy: 0.7094
+	Training loss: 0.4779
+	Hidden layer: (64,), Train accuracy: 0.9938, Validation accuracy: 0.7469
+	Training loss: 0.0953
+	Hidden layer: (128,), Train accuracy: 0.9992, Validation accuracy: 0.7562
+	Training loss: 0.0381
+	Hidden layer: (256,), Train accuracy: 0.9992, Validation accuracy: 0.7656
+	Training loss: 0.0169
+	Hidden layer: (1024,), Train accuracy: 1.0000, Validation accuracy: 0.7562
+	Training loss: 0.0045
+	Hidden layer: (128, 256, 128), Train accuracy: 1.0000, Validation accuracy:
+	0.7312
+	Training loss: 0.0041
+
+	Chosen model: Train accuracy: 0.9992, Validation accuracy: 0.7656
+	Training loss: 0.0169
+            1.1.3. Recognising Overfitting and Underfitting
+	Identifying overfitting and underfitting requires some experience and intuition, 	as there are no strict thresholds. The only way to detect them is by interpreting 	the model's accuracy in relation to the specific context.
+			Overfitting can typically be recognized when the training accuracy is 					significantly higher than the validation or test accuracy. In our case, we observed 			overfitting in the networks with hidden layer configurations of (64,), (128,), 				(256,), (1024,), and (128, 256, 128). Some of them, like (128, 256, 128), showed 			a gap of ~27 %, while others, like (256,), showed ~23 %. Although the latter still 			overfits, it achieved the best validation performance, so it was chosen despite 				the gap.
+			Underfitting, in contrast, occurs when the model is unable to learn from the 				training data properly. This results in both low training and validation accuracies. 			The model with (2,) hidden units is a good example, achieving only ~63 % 				training accuracy and ~52 % validation accuracy. Even though the gap between 				training and validation (~11 %) is smaller than the overfitting models mentioned 				above, its overall performance was worse.
+			A milder case of underfitting was seen with the (8,) model. It had a gap of 				~14 %, which seems acceptable, but the resulting validation accuracy was still 				lower than that of the slightly overfitting (256,) model.
+			In summary, a model that overfits slightly may still outperform an underfitting 				one in terms of actual classification performance.
+
+			Despite the slight overfitting, the model with (256,) was preferred because it 				achieved the highest validation accuracy overall. This indicates that slight 				overfitting is acceptable when it leads to better generalization performance than u			nderfitting or weaker models.
+
+            1.1.4. Overfitting
+	To prevent overfitting, the MLPClassifier in scikit-learn provides two built-in 	strategies: regularization and early stopping.
+
+	Regularization limits the size of the weights inside the neural network. This 	encourages the model to focus on learning the patterns in the data rather than 	memorizing individual training examples. → It reduces model complexity for 	generalization.
+
+	Early stopping, on the other hand, monitors the validation performance during 	training. Once the model stops improving on the validation set for several 	iterations, training is halted automatically. This prevents the model from 	continuing to learn and helps avoid overfitting – while still giving it enough time 	to learn meaningful patterns (prevent Underfitting).
+
+                       alpha = 0.1
+                       Hidden layer: (2,), Train accuracy: 0.6273, Validation accuracy: 0.5188
+                       Training loss: 0.9011
+                       Hidden layer: (8,), Train accuracy: 0.8414, Validation accuracy: 0.7031
+                       Training loss: 0.4917
+                       Hidden layer: (64,), Train accuracy: 0.9922, Validation accuracy: 0.7438
+                       Training loss: 0.1589
+                       Hidden layer: (128,), Train accuracy: 0.9984, Validation accuracy: 0.7438
+                       Training loss: 0.1146
+                       Hidden layer: (256,), Train accuracy: 0.9984, Validation accuracy: 0.7719
+                       Training loss: 0.0987
+                       Hidden layer: (1024,), Train accuracy: 1.0000, Validation accuracy: 0.7812
+                       Training loss: 0.0763
+                       Hidden layer: (128, 256, 128), Train accuracy: 1.0000, Validation accuracy: 0.7438
+                       Training loss: 0.0777
+               
+                       early_stopping = True
+                       Hidden layer: (2,), Train accuracy: 0.4523, Validation accuracy: 0.4031
+                       Training loss: 1.1224
+                       Hidden layer: (8,), Train accuracy: 0.7695, Validation accuracy: 0.6594
+                       Training loss: 0.6293
+                       Hidden layer: (64,), Train accuracy: 0.8055, Validation accuracy: 0.6844
+                       Training loss: 0.4790
+                       Hidden layer: (128,), Train accuracy: 0.9141, Validation accuracy: 0.7375
+                       Training loss: 0.1895
+                       Hidden layer: (256,), Train accuracy: 0.9203, Validation accuracy: 0.7188
+                       Training loss: 0.1711
+                       Hidden layer: (1024,), Train accuracy: 0.8352, Validation accuracy: 0.7469
+                       Training loss: 0.1988
+                       Hidden layer: (128, 256, 128), Train accuracy: 0.9414, Validation accuracy: 0.7281
+                       Training loss: 0.0201
+
+                       alpha = 0.1, early_stopping = True
+                       Hidden layer: (2,), Train accuracy: 0.4398, Validation accuracy: 0.3937
+                       Training loss: 1.1430
+                       Hidden layer: (8,), Train accuracy: 0.7672, Validation accuracy: 0.6625
+                       Training loss: 0.6385
+                       Hidden layer: (64,), Train accuracy: 0.8102, Validation accuracy: 0.6813
+                       Training loss: 0.4980
+                       Hidden layer: (128,), Train accuracy: 0.9102, Validation accuracy: 0.7406
+                       Training loss: 0.2516
+                       Hidden layer: (256,), Train accuracy: 0.9187, Validation accuracy: 0.7219
+                       Training loss: 0.2393
+                       Hidden layer: (1024,), Train accuracy: 0.8344, Validation accuracy: 0.7469
+                       Training loss: 0.2797
+                       Hidden layer: (128, 256, 128), Train accuracy: 0.9219, Validation accuracy: 0.7281
+                       Training loss: 0.1548
+
+                       Chosen model: Train: 1.0000, Validation: 0.7812, Loss: 0.0763,
+Best model case: a
+
+Yes, we did choose another model, as we found a model which has both better validation accuracy and a better gap between training and validation accuracy which we achieved by introducing a weight threshold, regularization, of
+alpha = 0.1.
+Our new model is now better at predicting the validation data and has a smaller gap, naming less overfitting. 
+            1.1.5. Plotting loss curve
+	We received the hint that MLPClassifier stores some training information in 	its attributes.
+	Upon inspection, we found that the training loss history over iterations is the 	only such information available.
+	Therefore, we chose to plot only this loss curve, as no validation or accuracy 	curves are tracked by the classifier.We’ve gotten the hind that the MLPClassifier 	saves some information about the training in his attributes. And as the training 	loss history across iterations is the only thing it holds, we only printed this. 
+        1.2. SPACEHOLDER
